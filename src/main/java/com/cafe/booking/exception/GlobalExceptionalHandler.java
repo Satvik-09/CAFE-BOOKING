@@ -1,0 +1,37 @@
+package com.cafe.booking.exception;
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionalHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String,String>> handleValidexception(MethodArgumentNotValidException ex){
+        Map<String,String> Errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->Errors.put(error.getField(),error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(Errors);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<Map<String, String>> handleRuntimeException (RuntimeException ex){
+            Map<String, String> error = new HashMap<>();
+            error.put("error", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String,String>> handlestatus(ResponseStatusException e){
+        return ResponseEntity.status(e.getStatusCode()).body(Map.of("error",String.valueOf(e.getReason())));
+    }
+}

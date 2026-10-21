@@ -1,0 +1,69 @@
+Microsoft Windows [Version 10.0.19045.7725]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"satvik\",\"password\":\"pass123\"}"
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYXR2aWsiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3OTIxNzk3MjMsImV4cCI6MTc5MjE4MzMyM30.W30CcdQKVqdmQ9hLicx1oF9E6uTt7DuryBliz8FuJkc
+C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"customer\",\"password\":\"pass123\"}"
+Invalid Credentials
+C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"customer\",\"password\":\"pass1234\"}"
+Invalid Credentials
+C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"cust1\",\"password\":\"pass1234\"}"
+Invalid Credentials
+C:\Users\dell>curl -s -w "\nStatus: %{http_code}\n" -X POST http://localhost:8080/auth/register -H "Content-Type: application/json" -d "{\"username\":\"customer\",\"password\":\"pass123\"}"
+Registered Successfully
+Status: 200
+
+C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"cust1\",\"password\":\"pass1234\"}"
+Invalid Credentials
+C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"customer\",\"password\":\"pass123\"}"
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyMTc5ODY3LCJleHAiOjE3OTIxODM0Njd9.XjKONMeA756MydBru8WPlNRtNYkNGYVsnmqkt7IWG2Q
+
+C:\Users\dell>set TOKEN=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYXR2aWsiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3OTIxNzk3MjMsImV4cCI6MTc5MjE4MzMyM30.W30CcdQKVqdmQ9hLicx1oF9E6uTt7DuryBliz8FuJkc
+
+C:\Users\dell>set USERTOKEN=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyMTc5ODY3LCJleHAiOjE3OTIxODM0Njd9.XjKONMeA756MydBru8WPlNRtNYkNGYVsnmqkt7IWG2Q
+
+C:\Users\dell>curl -s -w "\nStatus: %{http_code}\n" -X POST http://localhost:8080/admin/menu -H "Authorization: Bearer %USERTOKEN%" -H "Content-Type: application/json" -d "@espresso.json"
+
+Status: 403
+
+C:\Users\dell>curl -s -w "\nStatus: %{http_code}\n" -X POST http://localhost:8080/admin/menu -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "@espresso.json"
+{"error":"Cannot invoke \"com.cafe.booking.Service.MenuService.create(com.cafe.booking.dto.MenuItemRequest)\" because \"this.service\" is null"}
+Status: 500
+
+C:\Users\dell>curl -s -w "\nStatus: %{http_code}\n" -X POST http://localhost:8080/admin/menu -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "@espresso.json"
+{"id":7,"name":"Espresso","description":"Strong","price":90.00,"available":true}
+Status: 201
+
+C:\Users\dell>
+
++----+----------------------+----------+-------------+--------------+--------+
+| id | available            | category | description | name         | price  |
++----+----------------------+----------+-------------+--------------+--------+
+|  1 | 0x01                 | COFFEE   | NULL        | Cappuccino   | 120.00 |
+|  2 | 0x01                 | COFFEE   | NULL        | Latte        | 140.00 |
+|  3 | 0x01                 | TEA      | NULL        | Masala Chai  |  60.00 |
+|  4 | 0x01                 | TEA      | NULL        | Green Tea    |  80.00 |
+|  5 | 0x01                 | SNACK    | NULL        | Veg Sandwich | 150.00 |
+|  6 | 0x01                 | DESERT   | NULL        | Brownie      | 110.00 |
+|  7 | 0x01                 | COFFEE   | Strong      | Espresso     |  90.00 |
++----+----------------------+----------+-------------+--------------+--------+
+
+docker exec -it cafe-mysql mysql -uroot -prootpass cafe_db -e "SHOW TABLES;"
+docker exec -it cafe-mysql mysql -uroot -prootpass cafe_db -e "SELECT id, username, role FROM users;"
+docker exec -it cafe-mysql mysql -uroot -prootpass cafe_db -e "SELECT * FROM menu_items;"
+docker exec -it cafe-mysql mysql -uroot -prootpass cafe_db -e "DESCRIBE users;"
+
+
+
+Status	Meaning
+200	OK, here’s your data
+201	Created something new
+204	Done, nothing to send back (used for delete)
+400	You sent bad data
+403	You’re not allowed
+404	Not found
+409	Conflict, it already exists
+
+set TOKEN=
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyMTc5ODY3LCJleHAiOjE3OTIxODM0Njd9.XjKONMeA756MydBru8WPlNRtNYkNGYVsnmqkt7IWG2Q
