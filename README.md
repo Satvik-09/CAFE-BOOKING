@@ -1,5 +1,6 @@
 # Cafe Seating System
 
+[![CI](https://github.com/Satvik-09/CAFE-BOOKING/actions/workflows/ci.yml/badge.svg)](https://github.com/Satvik-09/CAFE-BOOKING/actions/workflows/ci.yml)
 A backend-focused cafe seating and reservation management system built with Java and Spring Boot. The project aims to simplify seat reservations, manage booking operations, and prevent conflicting bookings through reliable backend logic.
 
 > **Status:** Under Development
