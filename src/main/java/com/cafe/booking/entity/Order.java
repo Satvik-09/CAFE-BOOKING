@@ -39,7 +39,7 @@ public class Order {
         CreatedAt = LocalDateTime.now();
     }
 
-    public void AddItem(OrderItem item){
+    public void addItem(OrderItem item){
         items.add(item);
         item.setOrder(this);
     }
