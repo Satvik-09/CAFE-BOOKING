@@ -67,3 +67,203 @@ Status	Meaning
 
 set TOKEN=
 eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyMTc5ODY3LCJleHAiOjE3OTIxODM0Njd9.XjKONMeA756MydBru8WPlNRtNYkNGYVsnmqkt7IWG2Q
+
+
+
+
+
+Microsoft Windows [Version 10.0.19045.7725]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\dell>cd /d C:\Users\dell\Downloads\booking
+
+C:\Users\dell\Downloads\booking>C:\Users\dell\Downloads\booking>C:\Users\dell>curl -s -X POST http://localhost:8080/auth/login -H "Content-Type: application/json" -d "{\"username\":\"customer\",\"password\":\"pass123\"}"
+'C:\Users\dell\Downloads\booking' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\dell\Downloads\booking>'C:\Users\dell' is not recognized as an internal or external command,
+The filename, directory name, or volume label syntax is incorrect.
+
+C:\Users\dell\Downloads\booking>cd /d C:\Users\dell\Downloads\booking
+
+C:\Users\dell\Downloads\booking>curl -i -X POST "http://localhost:8080/auth/login" -H "Content-Type: application/json" -d "{\"username\":\"customer\",\"password\":\"pass123\"}"
+HTTP/1.1 200
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 174
+Date: Wed, 21 Oct 2026 18:09:28 GMT
+
+eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyNjA2MTY4LCJleHAiOjE3OTI2MDk3Njh9.IOvzQoOCXZIngue5kbuWzUXt710p_DhBlr5qtyvxB48Odo4DQdUZJtgCq6hTYQI8
+
+C:\Users\dell\Downloads\booking>set USERTOKEN=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyNjA2MTY4LCJleHAiOjE3OTI2MDk3Njh9.IOvzQoOCXZIngue5kbuWzUXt710p_DhBlr5qtyvxB48Odo4DQdUZJtgCq6hTYQI8
+
+C:\Users\dell\Downloads\booking>curl -s -w "\nStatus: %{http_code}\n" http://localhost:8080/reservations/my -H "Authorization: Bearer %USERTOKEN%"
+
+[{"id":2,"tableNumber":1,"date":"2026-12-25","startTime":"19:00:00","endTime":"20:00:00","partySize":2,"status":"CONFIRMED"},{"id":1,"tableNumber":1,"date":"2026-12-25","startTime":"18:00:00","endTime":"19:00:00","partySize":2,"status":"CONFIRMED"}]
+Status: 200
+
+C:\Users\dell\Downloads\booking>curl -i -X POST "http://localhost:8080/auth/register" -H "Content-Type: application/json" -d "{\"username\":\"customer1\",\"password\":\"pass123\"}"
+
+HTTP/1.1 200
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 23
+Date: Wed, 21 Oct 2026 18:17:41 GMT
+
+Registered Successfully
+
+C:\Users\dell\Downloads\booking>curl -i -X POST "http://localhost:8080/auth/login" -H "Content-Type: application/json" -d "{\"username\":\"customer1\",\"password\":\"pass123\"}"
+HTTP/1.1 200
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 176
+Date: Wed, 21 Oct 2026 18:17:55 GMT
+
+eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjdXN0b21lcjEiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc5MjYwNjY3NSwiZXhwIjoxNzkyNjEwMjc1fQ.uPPXsR3QAN14MZQnf9QDgvYVegV3FOQ_K1ROyJ9CwkrOhDUD2AXbaKTLRZ0hDbN6
+C:\Users\dell\Downloads\booking>set USERTOKEN1=
+
+C:\Users\dell\Downloads\booking>set USERTOKEN1=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjdXN0b21lcjEiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc5MjYwNjY3NSwiZXhwIjoxNzkyNjEwMjc1fQ.uPPXsR3QAN14MZQnf9QDgvYVegV3FOQ_K1ROyJ9CwkrOhDUD2AXbaKTLRZ0hDbN6
+
+C:\Users\dell\Downloads\booking>curl -s -w "\nStatus: %{http_code}\n" http://localhost:8080/reservations/my -H "Authorization: Bearer %USERTOKEN1%"
+[]
+Status: 200
+
+C:\Users\dell\Downloads\booking>set RID=1
+
+
+C:\Users\dell\Downloads\booking>DELETE /reservations/%RID%
+'DELETE' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\dell\Downloads\booking>curl -i -X DELETE "http://localhost:8080/reservations/%RID%" -H "Authorization: Bearer %TOKEN%"
+
+HTTP/1.1 403
+Set-Cookie: JSESSIONID=30F3480C80F42DB11E5C58D03065996A; Path=/; HttpOnly
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Wed, 21 Oct 2026 18:22:45 GMT
+
+{"timestamp":"2026-10-21T18:22:45.215Z","status":403,"error":"Forbidden","path":"/reservations/1"}
+
+C:\Users\dell\Downloads\booking>curl -i -X DELETE "http://localhost:8080/reservations/%RID%" -H "Authorization: Bearer %USERTOKEN%"
+
+HTTP/1.1 404
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Wed, 21 Oct 2026 18:23:11 GMT
+
+{"timestamp":"2026-10-21T18:23:11.540Z","status":404,"error":"Not Found","path":"/reservations/1"}
+
+C:\Users\dell\Downloads\booking>set USERTOKEN=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJjdXN0b21lciIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzkyNjA2MTY4LCJleHAiOjE3OTI2MDk3Njh9.IOvzQoOCXZIngue5kbuWzUXt710p_DhBlr5qtyvxB48Odo4DQdUZJtgCq6hTYQI8
+
+
+C:\Users\dell\Downloads\booking>curl -i -X DELETE "http://localhost:8080/reservations/%RID%" -H "Authorization: Bearer %USERTOKEN%"
+
+HTTP/1.1 404
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Wed, 21 Oct 2026 18:24:50 GMT
+
+{"timestamp":"2026-10-21T18:24:50.836Z","status":404,"error":"Not Found","path":"/reservations/1"}
+
+C:\Users\dell\Downloads\booking>curl -i -X DELETE "http://localhost:8080/reservations/%RID%" -H "Authorization: Bearer %USERTOKEN%"
+
+HTTP/1.1 404
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Wed, 21 Oct 2026 18:33:18 GMT
+
+{"timestamp":"2026-10-21T18:33:18.368Z","status":404,"error":"Not Found","path":"/reservations/1"}
+
+C:\Users\dell\Downloads\booking>curl -i -X DELETE "http://localhost:8080/reservations/cancel?id=1" -H "Authorization: Bearer %USERTOKEN%"
+
+HTTP/1.1 200
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Content-Length: 123
+Date: Wed, 21 Oct 2026 18:33:54 GMT
+
+{"id":1,"tableNumber":1,"date":"2026-12-25","startTime":"18:00:00","endTime":"19:00:00","partySize":2,"status":"CANCELLED"}
+
+C:\Users\dell\Downloads\booking>curl -i -X POST "http://localhost:8080/reservations" -H "Authorization: Bearer %USERTOKEN%" -H "Content-Type: application/json" --data-binary "@r1.json"
+
+
+curl: Failed to open r1.json
+curl: option --data-binary: error encountered when reading a file
+curl: try 'curl --help' for more information
+
+C:\Users\dell\Downloads\booking>curl -i -X POST "http://localhost:8080/reservations" -H "Authorization: Bearer %USERTOKEN%" -H "Content-Type: application/json" --data-binary "@api-tests/r1.json"
+
+HTTP/1.1 201
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Content-Length: 123
+Date: Wed, 21 Oct 2026 18:35:53 GMT
+
+{"id":3,"tableNumber":1,"date":"2026-12-25","startTime":"18:00:00","endTime":"19:00:00","partySize":2,"status":"CONFIRMED"}
+
+C:\Users\dell\Downloads\booking>curl -i -X DELETE "http://localhost:8080/reservations/9999" -H "Authorization: Bearer %USERTOKEN%"
+
+HTTP/1.1 404
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Wed, 21 Oct 2026 18:36:18 GMT
+
+{"timestamp":"2026-10-21T18:36:18.353Z","status":404,"error":"Not Found","path":"/reservations/9999"}
+
+C:\Users\dell\Downloads\booking>

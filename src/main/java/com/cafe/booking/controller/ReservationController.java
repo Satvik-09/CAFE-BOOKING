@@ -30,7 +30,7 @@ public class ReservationController {
         }
 
         @DeleteMapping("/cancel")
-      public ReservationResponse cancel(Authentication auth, Long id){
+      public ReservationResponse cancel(Authentication auth, @RequestParam Long id){
             return service.cancel(auth.getName(),id);
         }
 }
