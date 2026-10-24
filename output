@@ -259,7 +259,7 @@ X-XSS-Protection: 0
 Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
-X-Frame-Options: DENY
+X-Frame-Options: DENYpowershell -ExecutionPolicy Bypass -File api-tests\run-tests.ps1
 Content-Type: application/json
 Transfer-Encoding: chunked
 Date: Wed, 21 Oct 2026 18:36:18 GMT
@@ -267,3 +267,5 @@ Date: Wed, 21 Oct 2026 18:36:18 GMT
 {"timestamp":"2026-10-21T18:36:18.353Z","status":404,"error":"Not Found","path":"/reservations/9999"}
 
 C:\Users\dell\Downloads\booking>
+
+powershell -ExecutionPolicy Bypass -File api-tests\run-tests.ps1 // this is testing the notepad tests for all servicse

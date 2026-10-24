@@ -3,6 +3,7 @@ package com.cafe.booking.Service;
 import com.cafe.booking.dto.OrderItemRequest;
 import com.cafe.booking.dto.OrderRequest;
 import com.cafe.booking.dto.OrderResponse;
+import com.cafe.booking.entity.Enum.OrderStatus;
 import com.cafe.booking.entity.MenuItem;
 import com.cafe.booking.entity.Order;
 import com.cafe.booking.entity.OrderItem;
@@ -66,4 +67,17 @@ public class OrderService {
             return orderRepo.findByUserIdOrderByCreatedAtDesc(user.getId())
                     .stream().map(OrderResponse::from).toList();
     }
+
+
+        @Transactional
+    public OrderResponse updateStatus(Long id, OrderStatus next){
+        Order order = orderRepo.findDetailedById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"user not found"));
+        if(!order.getStatus().canMoveTo(next)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Cannot move order from" + order.getStatus()
+            + "to" + next);
+        }
+        order.setStatus(next);
+        return OrderResponse.from(order);
+        }
 }
