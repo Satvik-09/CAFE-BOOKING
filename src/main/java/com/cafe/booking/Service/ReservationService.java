@@ -43,7 +43,7 @@ public class ReservationService {
         }
 
         if(repo.existsOverlap(table.getId(),req.date(),req.startTime(),req.endTime(), ReservationStatus.CONFIRMED)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Table already booked for that time");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"Table already booked for that time");
         }
 
         Reservation res = new Reservation();
@@ -72,6 +72,6 @@ public class ReservationService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"not your reservation");
         }
         r.setStatus(ReservationStatus.CANCELLED);
-        return ReservationResponse.from(repo.save(r));
+        return ReservationResponse.from(r);
     }
 }

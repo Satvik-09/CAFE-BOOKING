@@ -15,14 +15,28 @@ function Call($method, $path, $token, $body) {
         return @{ Status = [int]$r.StatusCode; Body = $r.Content }
     } catch {
         $status = 0
-        if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
+        $resp = $_.Exception.Response
+        if ($resp) { $status = [int]$resp.StatusCode }
         $text = ""
-        if ($_.ErrorDetails) { $text = $_.ErrorDetails.Message }
+        if ($_.ErrorDetails -and $_.ErrorDetails.Message) {
+            $text = $_.ErrorDetails.Message
+        } elseif ($resp -and $resp.GetType().GetMethod("GetResponseStream")) {
+            $sr = New-Object System.IO.StreamReader($resp.GetResponseStream())
+            $text = $sr.ReadToEnd()
+            $sr.Close()
+        }
         return @{ Status = $status; Body = $text }
     }
 }
 
 function Json($r) { if ($r.Body) { $r.Body | ConvertFrom-Json } }
+
+function Token($r) {
+    $b = "$($r.Body)".Trim().Trim('"')
+    if ($b -match '^eyJ[\w-]+\.[\w-]+\.[\w-]+$') { return $b }
+    if ($b.StartsWith("{")) { return ($b | ConvertFrom-Json).token }
+    return $null
+}
 
 function Check($name, $expected, $r) {
     if ($r.Status -eq $expected) { Write-Host "PASS  $name -> $($r.Status)" -ForegroundColor Green; $script:pass++ }
@@ -40,8 +54,8 @@ Sql "DELETE FROM order_items; DELETE FROM orders; DELETE FROM reservations;"
 Call POST "/auth/register" $null '{"username":"satvik","password":"pass123"}' | Out-Null
 Call POST "/auth/register" $null '{"username":"customer","password":"pass123"}' | Out-Null
 Sql "UPDATE users SET role='ADMIN' WHERE username='satvik';"
-$admin = (Json (Call POST "/auth/login" $null '{"username":"satvik","password":"pass123"}')).token
-$cust  = (Json (Call POST "/auth/login" $null '{"username":"customer","password":"pass123"}')).token
+$admin = Token (Call POST "/auth/login" $null '{"username":"satvik","password":"pass123"}')
+$cust  = Token (Call POST "/auth/login" $null '{"username":"customer","password":"pass123"}')
 if (-not $admin -or -not $cust) { Write-Host "Login failed. Is the app running?" -ForegroundColor Red; exit 1 }
 
 # ---------- menu ----------
@@ -86,7 +100,7 @@ Sql "UPDATE menu_items SET available=0 WHERE id=6;"
 Check "O7 unavailable item" 409 (Call POST "/orders" $cust '{"items":[{"menuItemId":6,"quantity":1}]}')
 Sql "UPDATE menu_items SET available=1 WHERE id=6;"
 
-# ---------- lifecycle (fails until you build it) ----------
+# ---------- lifecycle ----------
 Write-Host "== Order lifecycle =="
 function St($s) { @{ status = $s } | ConvertTo-Json -Compress }
 $oid = (Json (Call POST "/orders" $cust $o1)).id
