@@ -46,7 +46,7 @@ public class OrderService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "menu item not available" + menuItem.getName());
             }
             OrderItem item = new OrderItem();
-            item.setMenu(menuItem);
+            item.setMenuItem(menuItem);
             item.setQuantity(line.quantity());
             item.setPriceAtOrder(menuItem.getPrice());
             order.addItem(item);
