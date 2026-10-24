@@ -33,7 +33,7 @@ public class OrderService {
 
         Order order = new Order();
         order.setUser(user);
-        orderRepo.save(order);//insert runs here so the rollback experiment can be used here
+
 
         BigDecimal total = BigDecimal.ZERO;
         for (OrderItemRequest line : req.items()) {
@@ -54,7 +54,7 @@ public class OrderService {
         }
             order.setTotalAmount(total);
 
-            return OrderResponse.from(order);
+            return OrderResponse.from(orderRepo.save(order));
 
     }
 
