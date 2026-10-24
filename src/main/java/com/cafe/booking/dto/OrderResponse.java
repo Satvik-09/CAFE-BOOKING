@@ -12,7 +12,7 @@ public record OrderResponse(Long id, OrderStatus status, BigDecimal TotalAmount,
 public static OrderResponse from(Order o) {
     List<OrderItemResponse> lines = o.getItems().stream()
             .map(i -> new OrderItemResponse(
-                    i.getMenu().getName(),
+                    i.getMenuItem().getName(),
                    i.getQuantity(),
                     i.getPriceAtOrder(),
                     i.getPriceAtOrder().multiply(BigDecimal.valueOf(i.getQuantity()))

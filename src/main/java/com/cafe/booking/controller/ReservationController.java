@@ -29,8 +29,8 @@ public class ReservationController {
             return service.mine(auth.getName());
         }
 
-        @DeleteMapping("/cancel")
-      public ReservationResponse cancel(Authentication auth, @RequestParam Long id){
+        @DeleteMapping("/{id}")
+      public ReservationResponse cancel(Authentication auth, @PathVariable Long id){
             return service.cancel(auth.getName(),id);
         }
 }

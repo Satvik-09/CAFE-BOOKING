@@ -23,9 +23,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-    private OrderRepository orderRepo;
-    private MenuItemRepository menuRepo;
-    private UserRepository userRepo;
+    private final OrderRepository orderRepo;
+    private final MenuItemRepository menuRepo;
+    private final   UserRepository userRepo;
 
     @Transactional
     public OrderResponse place(String username, OrderRequest req) {
@@ -38,15 +38,15 @@ public class OrderService {
 
         BigDecimal total = BigDecimal.ZERO;
         for (OrderItemRequest line : req.items()) {
-            MenuItem menuItem = menuRepo.findById(line.menuitemid())
+            MenuItem menuItem = menuRepo.findById(line.menuItemId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "menu item not found" + line.menuitemid()));
+                            "menu item not found" + line.menuItemId()));
 
             if (!menuItem.isAvailable()) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "menu item not available" + menuItem.getName());
             }
             OrderItem item = new OrderItem();
-            item.setMenu(menuItem);
+            item.setMenuItem(menuItem);
             item.setQuantity(line.quantity());
             item.setPriceAtOrder(menuItem.getPrice());
             order.addItem(item);
@@ -72,12 +72,27 @@ public class OrderService {
         @Transactional
     public OrderResponse updateStatus(Long id, OrderStatus next){
         Order order = orderRepo.findDetailedById(id)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"user not found"));
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found"));
         if(!order.getStatus().canMoveTo(next)){
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Cannot move order from" + order.getStatus()
             + "to" + next);
         }
         order.setStatus(next);
+        return OrderResponse.from(order);
+        }
+
+        @Transactional
+    public  OrderResponse cancelMine(String username,Long id){
+        Order order = orderRepo.findDetailedById(id)
+                .filter(o->o.getUser().getUsername().equals(username))
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found"));
+
+        if(order.getStatus() != OrderStatus.PLACED){
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"only placed orders can be cancelled");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
         return OrderResponse.from(order);
         }
 }
