@@ -1,4 +1,4 @@
-# Cafe Booking & Seating System
+                                            # Cafe Booking & Seating System
 
 [![CI](https://github.com/Satvik-09/CAFE-BOOKING/actions/workflows/ci.yml/badge.svg)](https://github.com/Satvik-09/CAFE-BOOKING/actions/workflows/ci.yml)
 ![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
