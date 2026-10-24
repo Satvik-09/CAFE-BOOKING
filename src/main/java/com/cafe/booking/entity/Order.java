@@ -34,10 +34,15 @@ public class Order {
 
     private LocalDateTime CreatedAt;
 
+    private LocalDateTime updatedAt;
+
     @PrePersist
       void Oncreate(){
         CreatedAt = LocalDateTime.now();
+        updatedAt = CreatedAt;
     }
+    @PreUpdate
+    void onUpdate() { updatedAt = LocalDateTime.now(); }
 
     public void addItem(OrderItem item){
         items.add(item);
