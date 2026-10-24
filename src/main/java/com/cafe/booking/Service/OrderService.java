@@ -25,7 +25,7 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepo;
     private final MenuItemRepository menuRepo;
-    private final UserRepository userRepo;
+    private final   UserRepository userRepo;
 
     @Transactional
     public OrderResponse place(String username, OrderRequest req) {
@@ -72,7 +72,7 @@ public class OrderService {
         @Transactional
     public OrderResponse updateStatus(Long id, OrderStatus next){
         Order order = orderRepo.findDetailedById(id)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"user not found"));
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found"));
         if(!order.getStatus().canMoveTo(next)){
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Cannot move order from" + order.getStatus()
             + "to" + next);
@@ -85,7 +85,7 @@ public class OrderService {
     public  OrderResponse cancelMine(String username,Long id){
         Order order = orderRepo.findDetailedById(id)
                 .filter(o->o.getUser().getUsername().equals(username))
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"user not found"));
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found"));
 
         if(order.getStatus() != OrderStatus.PLACED){
             throw new ResponseStatusException(HttpStatus.CONFLICT,"only placed orders can be cancelled");

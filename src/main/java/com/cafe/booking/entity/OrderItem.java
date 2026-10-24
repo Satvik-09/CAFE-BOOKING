@@ -21,7 +21,7 @@ public class OrderItem {
 
       @ManyToOne(fetch = FetchType.LAZY,optional = false)
       @JoinColumn(name = "menu_item_id",nullable = false)
-      private MenuItem menu;
+      private MenuItem menuItem;
 
       @Column(nullable = false)
       private Integer quantity;

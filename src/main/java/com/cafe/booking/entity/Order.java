@@ -32,17 +32,18 @@ public class Order {
     @Column(nullable = false,precision = 10,scale = 2)
     private BigDecimal TotalAmount = BigDecimal.ZERO;
 
-    private LocalDateTime CreatedAt;
+    private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
     @PrePersist
       void Oncreate(){
-        CreatedAt = LocalDateTime.now();
-        updatedAt = CreatedAt;
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
     }
     @PreUpdate
-    void onUpdate() { updatedAt = LocalDateTime.now(); }
+    void onUpdate() { updatedAt = LocalDateTime.now();
+    }
 
     public void addItem(OrderItem item){
         items.add(item);

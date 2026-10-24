@@ -32,7 +32,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/cancel")
-    public OrderResponse cancel(Authentication auth, Long id){
+    public OrderResponse cancel(Authentication auth, @PathVariable  Long id){
         return service.cancelMine(auth.getName(), id);
     }
 
