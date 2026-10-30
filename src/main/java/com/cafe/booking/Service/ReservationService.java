@@ -27,16 +27,17 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(String username, ReservationRequest req){
-        UserEntity user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not Found"));
-
-        CafeTable table = tablerepo.findById( req.tableId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Table not Found"));
 
         if(!req.endTime().isAfter(req.startTime())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"End time must be after start time");
-
         }
+
+        CafeTable table = tablerepo.findByIdForUpdate(req.tableId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Table not Found"));
+
+        UserEntity user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not Found"));
+
 
         if(req.partySize() > table.getCapacity()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"party too large for this table");
