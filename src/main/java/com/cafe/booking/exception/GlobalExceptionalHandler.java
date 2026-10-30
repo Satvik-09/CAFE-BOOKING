@@ -1,6 +1,8 @@
 package com.cafe.booking.exception;
 
 
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -40,5 +42,11 @@ public class GlobalExceptionalHandler {
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<Map<String, String>> badInput(Exception e) {
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid request value"));
+    }
+
+    @ExceptionHandler({PessimisticLockingFailureException.class, OptimisticLockingFailureException.class})
+    public ResponseEntity<Map<String, String>> lockConflict(Exception e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "The table is being booked by someone else. Please retry."));
     }
 }
