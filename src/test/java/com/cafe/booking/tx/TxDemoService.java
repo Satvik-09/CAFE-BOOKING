@@ -25,7 +25,8 @@ public class TxDemoService {
     }
 
     @Transactional //bydefault mysql has propogation set as REQUIRED
-    public void saveThenRuntimeFail(String name){
+    public void saveThenRuntimeFail(String name)
+    {
         menuRepo.save(item(name));
         throw new IllegalStateException("boom");
     }
@@ -45,7 +46,7 @@ public class TxDemoService {
         menuRepo.save(item(name));
         throw new Exception("boom");
     }
-      // not annotated : the call beloow goes through 'this' its in same class soobj not require, proxy never sees it
+      // not annotated : the call below goes through 'this' its in same class so obj not require, proxy never sees it
     public void selfInvocation(String name){
         saveThenRuntimeFail(name);
     }

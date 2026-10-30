@@ -22,12 +22,15 @@ public interface ReservationRepository extends JpaRepository<Reservation ,Long> 
           and r.endTime > :start
            """)
 
-    boolean existsOverlap(@Param("tableId") Long tableId ,
+    Boolean existsOverlap(@Param("tableId") Long tableId ,
                            @Param("date")LocalDate date ,
                            @Param("start")LocalTime start,
                            @Param("end") LocalTime end,
                            @Param("status") ReservationStatus status);
     List<Reservation> findByUserIdOrderByReservationDateDescStartTimeDesc(Long userid);
+
+    long countByTable_IdAndReservationDateAndStatus(Long tableId, LocalDate date,ReservationStatus status);
+
 
 
 }
