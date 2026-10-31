@@ -95,4 +95,12 @@ public class OrderService {
 
         return OrderResponse.from(order);
         }
+
+        @Transactional(readOnly = true)
+    public OrderResponse getMine(String username, Long id){
+        return orderRepo.findDetailedById(id)
+                .filter(o -> o.getUser().getUsername().equals(username))
+                .map(OrderResponse::from)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Order not found"));
+        }
 }
