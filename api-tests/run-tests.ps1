@@ -5,14 +5,16 @@ $script:fail = 0
 function Sql($query) {
     docker exec cafe-mysql mysql -uroot -prootpass cafe_db -e $query 2>$null | Out-Null
 }
-
-function Call($method, $path, $token, $body) {
+function Call($method, $path, $token, $body, $extra = @{}) {
+    $h = @{}
+    if ($token) { $h["Authorization"] = "Bearer $token" }
+    foreach ($k in $extra.Keys) { $h[$k] = $extra[$k] }
     $p = @{ Uri = "$base$path"; Method = $method; UseBasicParsing = $true }
-    if ($token) { $p.Headers = @{ Authorization = "Bearer $token" } }
-    if ($body)  { $p.Body = $body; $p.ContentType = "application/json" }
+    if ($h.Count -gt 0) { $p.Headers = $h }
+    if ($body) { $p.Body = $body; $p.ContentType = "application/json" }
     try {
         $r = Invoke-WebRequest @p
-        return @{ Status = [int]$r.StatusCode; Body = $r.Content }
+        return @{ Status = [int]$r.StatusCode; Body = $r.Content; Headers = $r.Headers }
     } catch {
         $status = 0
         $resp = $_.Exception.Response
@@ -25,7 +27,7 @@ function Call($method, $path, $token, $body) {
             $text = $sr.ReadToEnd()
             $sr.Close()
         }
-        return @{ Status = $status; Body = $text }
+        return @{ Status = $status; Body = $text; Headers = @{} }
     }
 }
 
@@ -129,3 +131,29 @@ Check "C5 cancel unknown order" 404 (Call POST "/orders/9999/cancel" $cust $null
 Write-Host ""
 Write-Host "Passed: $($script:pass)   Failed: $($script:fail)"
 if ($script:fail -gt 0) { exit 1 }
+
+
+# ---------- idempotency ----------
+Write-Host "== Idempotency =="
+$key = [guid]::NewGuid().ToString()
+$k1 = @{ "Idempotency-Key" = $key }
+$a = Call POST "/orders" $cust $o1 $k1
+Check "ID1 first request creates" 201 $a
+$idA = (Json $a).id
+$b = Call POST "/orders" $cust $o1 $k1
+Check "ID2 retry returns 201" 201 $b
+Assert "ID2 same order id" ((Json $b).id -eq $idA)
+Assert "ID2 marked as replay" ($b.Headers["Idempotent-Replayed"] -eq "true")
+Check "ID3 same key, different body" 422 (Call POST "/orders" $cust '{"items":[{"menuItemId":2,"quantity":1}]}' $k1)
+$c = Call POST "/orders" $cust $o1 @{ "Idempotency-Key" = [guid]::NewGuid().ToString() }
+Check "ID4 new key creates a new order" 201 $c
+Assert "ID4 different order id" ((Json $c).id -ne $idA)
+Check "ID5 no key still works" 201 (Call POST "/orders" $cust $o1 $null)
+$rd = (Get-Date).AddDays(40).ToString("yyyy-MM-dd")
+$rb = @{ tableId = 2; date = $rd; startTime = "10:00"; endTime = "11:00"; partySize = 2 } | ConvertTo-Json -Compress
+$rk = @{ "Idempotency-Key" = [guid]::NewGuid().ToString() }
+$r1 = Call POST "/reservations" $cust $rb $rk
+Check "ID6 reservation first request" 201 $r1
+$r2 = Call POST "/reservations" $cust $rb $rk
+Check "ID7 reservation retry replays" 201 $r2
+Assert "ID7 same reservation id" ((Json $r2).id -eq (Json $r1).id)

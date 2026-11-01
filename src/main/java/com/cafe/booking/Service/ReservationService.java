@@ -75,4 +75,12 @@ public class ReservationService {
         r.setStatus(ReservationStatus.CANCELLED);
         return ReservationResponse.from(r);
     }
+
+    @Transactional(readOnly = true)
+    public ReservationResponse getMine(String username,Long id){
+        return repo.findById(id)
+                .filter(r -> r.getUser().getUsername().equals(username))
+                .map(ReservationResponse::from)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Reservation not found"));
+    }
 }
