@@ -22,11 +22,6 @@ public class ReservationController {
              private final ReservationService service;
              private final IdempotencyService idempotency;
 
-        @PostMapping
-      public ReservationResponse create(Authentication auth, @Valid @RequestBody ReservationRequest req){
-            return service.create(auth.getName(),req);
-        }
-
         @GetMapping("/my")
       public List<ReservationResponse> mine(Authentication auth){
             return service.mine(auth.getName());

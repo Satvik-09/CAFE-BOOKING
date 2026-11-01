@@ -269,3 +269,5 @@ Date: Wed, 21 Oct 2026 18:36:18 GMT
 C:\Users\dell\Downloads\booking>
 
 powershell -ExecutionPolicy Bypass -File api-tests\run-tests.ps1 // this is testing the notepad tests for all servicse
+
+docker exec -it cafe-mysql mysql -uroot -prootpass cafe_db
