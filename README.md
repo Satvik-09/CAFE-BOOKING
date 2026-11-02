@@ -1,10 +1,29 @@
 # Cafe Booking API
 
 ![CI](https://github.com/Satvik-09/CAFE-BOOKING/actions/workflows/ci.yml/badge.svg)
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4-6DB33F?logo=springboot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
 A backend for a cafe: customers browse the menu, book tables and place orders, and staff move orders through a controlled lifecycle. The project is built to practise the problems real backends face: transactions, concurrency, idempotency and role-based security.
 
 > **Status:** the core backend is complete (authentication, menu, reservations, orders, order lifecycle, transactions, double-booking prevention, idempotent requests). Packaging the app in Docker, caching, deployment and a front end are still planned. See [Roadmap](#roadmap).
+
+## Quick start
+
+1. `git clone https://github.com/Satvik-09/CAFE-BOOKING.git && cd CAFE-BOOKING`
+2. `docker compose up -d` (starts MySQL on port 3306)
+3. `./mvnw spring-boot:run` (Windows: `.\mvnw.cmd spring-boot:run`), then open <http://localhost:8080/swagger-ui.html>
+
+<!-- ============================================================
+     SCREENSHOT 1 of 4  ->  docs/images/swagger-ui.png
+     What: the full Swagger UI page with all endpoint groups visible
+     Needs: springdoc-openapi added to pom.xml first
+     ============================================================ -->
+<p align="center">
+  <img src="docs/images/swagger-ui.png" alt="Swagger UI showing all Cafe Booking API endpoints" width="800">
+</p>
 
 ## Highlights
 
@@ -22,6 +41,7 @@ A backend for a cafe: customers browse the menu, book tables and place orders, a
 | Language and framework | Java 21, Spring Boot 4 |
 | Persistence | Spring Data JPA, Hibernate, MySQL 8 |
 | Security | Spring Security, JWT (jjwt), BCrypt |
+| API docs | springdoc-openapi (Swagger UI) |
 | Build and tests | Maven, JUnit 5, Spring Boot Test |
 | Local infrastructure | Docker Compose (MySQL) |
 | CI | GitHub Actions |
@@ -40,8 +60,13 @@ Client
 - Each service method is one transaction, so lazy loading and dirty checking happen inside it.
 - Security runs as a filter before the controllers: the JWT's role claim becomes a `ROLE_*` authority, and `/admin/**` requires `ROLE_ADMIN`.
 
-### Database Schema
+### Database schema
 
+<!-- Mermaid renders on GitHub, so no image file is needed here.
+     Compare column names with your real entities and adjust. -->
+
+```mermaid
+erDiagram
     USERS ||--o{ RESERVATIONS : makes
     USERS ||--o{ ORDERS : places
     CAFE_TABLES ||--o{ RESERVATIONS : "is booked in"
@@ -82,7 +107,6 @@ Client
         bigint user_id FK
         varchar status "PLACED, PREPARING, SERVED, CANCELLED"
         decimal total
-        datetime created_at
     }
 
     ORDER_ITEMS {
@@ -98,9 +122,20 @@ Client
         varchar username
         varchar idempotency_key
         varchar endpoint
-        varchar request_hash
-        bigint resource_id
     }
+```
+
+### Order lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> PLACED
+    PLACED --> PREPARING
+    PREPARING --> SERVED
+    PLACED --> CANCELLED
+    PREPARING --> CANCELLED
+    SERVED --> [*]
+    CANCELLED --> [*]
 ```
 
 ## Features and status
@@ -116,6 +151,7 @@ Client
 | Transactions | Done | Demonstrated and tested (rollback rules, propagation, self-invocation) |
 | Concurrency control | Done | Pessimistic row lock plus a parallel test |
 | Idempotency keys | Done | Orders and reservations |
+| Swagger UI | Done | `/swagger-ui.html` |
 | Admin order list with filters | Planned | Open issue |
 | App Dockerfile and full compose stack | Planned | |
 | Redis menu cache | Planned | |
@@ -157,6 +193,15 @@ curl -X POST http://localhost:8080/reservations \
      -d '{"tableId":1,"date":"2027-01-15","startTime":"18:00","endTime":"19:00","partySize":2}'
 ```
 
+<!-- ============================================================
+     SCREENSHOT 2 of 4  ->  docs/images/idempotency-409-201.png
+     What: first booking returns 201, booking the same slot again returns 409
+           (combine both responses into one image if you like)
+     ============================================================ -->
+<p align="center">
+  <img src="docs/images/idempotency-409-201.png" alt="Booking a table returns 201, booking the same slot again returns 409" width="800">
+</p>
+
 ## Design decisions
 
 **State machine for order status.** The allowed moves live in `OrderStatus.canMoveTo`, an exhaustive `switch`. Adding a status later makes the compiler flag the method. The service answers an illegal move with `409`, because the request is valid but conflicts with the order's current state.
@@ -188,15 +233,39 @@ powershell -ExecutionPolicy Bypass -File api-tests\run-tests.ps1   # app must be
 
 The script wipes `orders`, `order_items` and `reservations` each run, so use it only against a development database.
 
+<!-- ============================================================
+     SCREENSHOT 3 of 4  ->  docs/images/double-booking-test.png
+     What: DoubleBookingRaceTest passing (green check in IntelliJ Run panel,
+           or the terminal showing "Tests run: ..., Failures: 0")
+     ============================================================ -->
+<p align="center">
+  <img src="docs/images/double-booking-test.png" alt="DoubleBookingRaceTest passing: 8 parallel requests, exactly one booking" width="800">
+</p>
+
+### Continuous integration
+
+<!-- ============================================================
+     SCREENSHOT 4 of 4  ->  docs/images/ci-actions-cafe.png
+     ALREADY IN YOUR REPO, nothing to add. Optionally retake it so it
+     shows your most recent green run.
+     ============================================================ -->
+<p align="center">
+  <a href="https://github.com/Satvik-09/CAFE-BOOKING/actions">
+    <img src="docs/images/ci-actions-cafe.png" alt="GitHub Actions workflow runs for Cafe Booking" width="800">
+  </a>
+</p>
+
+Live status: [GitHub Actions](https://github.com/Satvik-09/CAFE-BOOKING/actions)
+
 ## Running locally
 
-Requirements: Java 21, Maven, Docker Desktop.
+Requirements: Java 21, Docker Desktop (Maven is optional because the project includes the Maven wrapper).
 
 ```bash
 git clone https://github.com/Satvik-09/CAFE-BOOKING.git
 cd CAFE-BOOKING
 docker compose up -d        # starts MySQL on port 3306
-mvn spring-boot:run         # or run BookingApplication from your IDE
+./mvnw spring-boot:run      # Windows: .\mvnw.cmd spring-boot:run
 ```
 
 To create an admin, register a user and then run:
@@ -204,6 +273,8 @@ To create an admin, register a user and then run:
 ```sql
 UPDATE users SET role = 'ADMIN' WHERE username = 'your-username';
 ```
+
+To try protected endpoints in Swagger UI: call `/auth/login`, copy the token from the response, click **Authorize** and paste it.
 
 ## Configuration
 
@@ -227,9 +298,18 @@ src/main/java/com/cafe/booking
   util/                    JWT utilities
 src/test/java/...          unit, transaction and concurrency tests
 api-tests/                 end-to-end API script
+docs/images/               README screenshots
 docker-compose.yml         MySQL for local development
 .github/workflows/ci.yml   continuous integration
 ```
+
+## What I learned
+
+- A check-then-act sequence is a race condition. I reproduced a double booking with parallel requests, then fixed it with a pessimistic row lock.
+- Why `@Transactional` silently does nothing when a method calls another method on `this` (the proxy is bypassed), and how `rollbackFor` changes checked-exception behaviour.
+- How idempotency keys make retries safe, and why a unique database constraint is a better referee than an application-level check.
+- Why answering `404` instead of `403` for someone else's order avoids revealing that it exists.
+- How to model a lifecycle as a state machine so illegal moves are impossible rather than merely discouraged.
 
 ## Known limitations
 
@@ -245,7 +325,8 @@ docker-compose.yml         MySQL for local development
 - [x] Menu, reservations, orders
 - [x] Order lifecycle and customer cancel
 - [x] Transactions, concurrency control, idempotency
-- [x] README ER diagram and screenshots
+- [x] README ER diagram, lifecycle diagram and screenshots
+- [x] Swagger UI
 - [ ] Security hardening (sanitised errors, input limits, rate limiting)
 - [ ] App Dockerfile and a one-command compose stack
 - [ ] Admin order list with filters and pagination
@@ -256,3 +337,11 @@ docker-compose.yml         MySQL for local development
 ## Git workflow
 
 Every change goes through an issue, a branch, a pull request with a green CI check, and a squash merge. Commits follow `type(scope): summary (#issue)`.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
+
+## Author
+
+**Satvik** · Java backend development · [GitHub](https://github.com/Satvik-09)
