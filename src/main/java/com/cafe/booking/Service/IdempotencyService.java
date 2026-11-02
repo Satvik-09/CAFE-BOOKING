@@ -66,6 +66,7 @@ public class IdempotencyService {
     }
 
     private Result replay(String username, String key, String endpoint, String hash) {
+
         IdempotencyRecord rec = tx.execute(s ->
                 repo.findByUsernameAndIdemKeyAndEndpoint(username, key, endpoint).orElse(null));
 
@@ -82,7 +83,8 @@ public class IdempotencyService {
     private static String sha256(String s){
         try{
             return HexFormat.of().formatHex(
-                    MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8)));
+                    MessageDigest.getInstance("SHA-256")
+                            .digest(s.getBytes(StandardCharsets.UTF_8)));
         }
         catch (NoSuchAlgorithmException ex){
             throw new IllegalStateException(ex);

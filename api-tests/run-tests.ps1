@@ -128,9 +128,6 @@ $c4 = (Json (Call POST "/orders" $admin $o1)).id
 Check "C4 cancel someone else's order" 404 (Call POST "/orders/$c4/cancel" $cust $null)
 Check "C5 cancel unknown order" 404 (Call POST "/orders/9999/cancel" $cust $null)
 
-Write-Host ""
-Write-Host "Passed: $($script:pass)   Failed: $($script:fail)"
-if ($script:fail -gt 0) { exit 1 }
 
 
 # ---------- idempotency ----------
@@ -157,3 +154,12 @@ Check "ID6 reservation first request" 201 $r1
 $r2 = Call POST "/reservations" $cust $rb $rk
 Check "ID7 reservation retry replays" 201 $r2
 Assert "ID7 same reservation id" ((Json $r2).id -eq (Json $r1).id)
+
+
+
+
+Write-Host ""
+Write-Host "Passed: $($script:pass)   Failed: $($script:fail)"
+if ($script:fail -gt 0) { exit 1 }
+
+

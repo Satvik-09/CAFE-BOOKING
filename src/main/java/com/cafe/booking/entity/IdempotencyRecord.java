@@ -14,19 +14,19 @@ import java.time.LocalDateTime;
 public class IdempotencyRecord {
 
      @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+     private Long id;
 
      @Column(nullable = false,length = 50)
-    private String username;
+     private String username;
 
      @Column(name = "idem_key",nullable = false,length = 64)
-      private String idemKey;
+     private String idemKey;
 
      @Column(nullable = false,length = 40)
-    private String endpoint;
+     private String endpoint;
 
      @Column(nullable = false,length = 64)
-    private String requestHash;
+     private String requestHash;
 
      private Long resourceId;
      private LocalDateTime createdAt;

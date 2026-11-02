@@ -27,6 +27,7 @@ public interface ReservationRepository extends JpaRepository<Reservation ,Long> 
                            @Param("start")LocalTime start,
                            @Param("end") LocalTime end,
                            @Param("status") ReservationStatus status);
+
     List<Reservation> findByUserIdOrderByReservationDateDescStartTimeDesc(Long userid);
 
     long countByTable_IdAndReservationDateAndStatus(Long tableId, LocalDate date,ReservationStatus status);

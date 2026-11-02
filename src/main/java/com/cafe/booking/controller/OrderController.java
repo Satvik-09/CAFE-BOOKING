@@ -43,6 +43,7 @@ public class OrderController {
 
         IdempotencyService.Result r = idempotency.run(user,key,"POST /orders", req,
                 () -> service.place(user,req).id());
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header("Idempotent-Replayed", String.valueOf(r.replayed()))
                 .body(service.getMine(user,r.resourceId()));
